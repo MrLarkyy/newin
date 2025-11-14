@@ -1,0 +1,7 @@
+name: newin
+version: '1.0-SNAPSHOT'
+main: lol.farsight.newin.Entrypoint
+loader: lol.farsight.newin.Load
+api-version: '1.21'
+load: STARTUP
+authors: [ yearbarber ]
