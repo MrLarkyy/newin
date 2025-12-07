@@ -28,6 +28,13 @@ tasks {
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21.10")
     }
+
+    shadowJar {
+        archiveClassifier.set("")
+
+        // Exclude kotlin stuff - Kotlin should be shaded or loaded thru Libraries resolver in Paper.
+        exclude("kotlin/**", "org/intellij/**","org/jetbrains/**")
+    }
 }
 
 tasks.assemble.dependsOn(shadowJar)
