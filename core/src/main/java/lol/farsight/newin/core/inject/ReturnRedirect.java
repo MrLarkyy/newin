@@ -1,4 +1,4 @@
-package lol.farsight.newin.api.inject;
+package lol.farsight.newin.core.inject;
 
 public final class ReturnRedirect {
     private boolean redirected = false;

@@ -1,4 +1,4 @@
-package lol.farsight.newin.api.inject;
+package lol.farsight.newin.core.inject;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;

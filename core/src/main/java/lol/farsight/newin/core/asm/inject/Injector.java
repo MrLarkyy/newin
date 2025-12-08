@@ -1,7 +1,7 @@
 package lol.farsight.newin.core.asm.inject;
 
 import com.google.common.base.Preconditions;
-import lol.farsight.newin.api.annotation.method.Inject;
+import lol.farsight.newin.core.annotation.method.Inject;
 import lol.farsight.newin.core.asm.gen.EphemeralClassGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.MethodVisitor;

@@ -1,7 +1,7 @@
 package lol.farsight.newin.core.asm;
 
 import com.google.common.base.Preconditions;
-import lol.farsight.newin.api.annotation.Newin;
+import lol.farsight.newin.core.annotation.Newin;
 import lol.farsight.newin.core.asm.annotation.AnnotationCollector;
 import lol.farsight.newin.core.asm.annotation.MethodSkeletonCollector;
 import lol.farsight.newin.core.asm.gen.EphemeralClassGenerator;

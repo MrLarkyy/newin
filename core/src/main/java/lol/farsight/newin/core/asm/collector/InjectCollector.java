@@ -1,6 +1,6 @@
 package lol.farsight.newin.core.asm.collector;
 
-import lol.farsight.newin.api.annotation.method.Inject;
+import lol.farsight.newin.core.annotation.method.Inject;
 import lol.farsight.newin.core.asm.annotation.MethodSkeletonCollector;
 import lol.farsight.newin.core.asm.inject.Injector;
 import lol.farsight.newin.core.skeleton.InjectSkeleton;

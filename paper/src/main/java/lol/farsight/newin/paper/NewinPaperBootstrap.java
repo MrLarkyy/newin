@@ -1,20 +1,23 @@
-package lol.farsight.newin;
+package lol.farsight.newin.paper;
 
+import com.google.common.base.Preconditions;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
-import io.papermc.paper.plugin.loader.PluginLoader;
-import lol.farsight.newin.agent.AgentEntrypoint;
-import lol.farsight.newin.agent.InstrumentationHolder;
+import lol.farsight.newin.core.agent.AgentEntrypoint;
+import lol.farsight.newin.core.agent.InstrumentationHolder;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.JarEntry;
@@ -22,20 +25,28 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-// earliest point a paper plugin can
-// possibly run code at
+public final class NewinPaperBootstrap {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewinPaperBootstrap.class);
 
-@SuppressWarnings("UnstableApiUsage")
-public final class Load implements PluginLoader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Load.class);
+    private static final Method GET_FILE_METHOD;
+    static {
+        try {
+            GET_FILE_METHOD = JavaPlugin.class.getDeclaredMethod("getFile");
+        } catch (final NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
 
-    @SuppressWarnings("removal")
-    @Override
-    public void classloader(final @NotNull PluginClasspathBuilder builder) {
+        GET_FILE_METHOD.setAccessible(true);
+    }
+
+    private NewinPaperBootstrap() {}
+
+    public static void acknowledge(final @NotNull JavaPlugin plugin) {
+        Preconditions.checkNotNull(plugin, "plugin");
+
         final Path agent;
         {
-            final var dataFolder = builder.getContext().getDataDirectory()
-                    .toFile();
+            final var dataFolder = plugin.getDataFolder();
             dataFolder.mkdirs();
 
             agent = dataFolder.toPath()
@@ -47,8 +58,15 @@ public final class Load implements PluginLoader {
             manifest.getMainAttributes().putValue("Can-Redefine-Classes", "true");
             manifest.getMainAttributes().putValue("Can-Retransform-Classes", "true");
 
+            final File pluginJar;
+            try {
+                pluginJar = (File) GET_FILE_METHOD.invoke(plugin);
+            } catch (final InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
             try (
-                    final var jar = new JarFile(builder.getContext().getPluginSource().toFile());
+                    final var jar = new JarFile(pluginJar);
                     final var jos = new JarOutputStream(
                             Files.newOutputStream(agent),
                             manifest
@@ -56,7 +74,6 @@ public final class Load implements PluginLoader {
             ) {
                 String name;
                 JarEntry entry;
-
                 {
                     name = AgentEntrypoint.class.getName().replace('.', '/') + ".class";
                     entry = jar.getJarEntry(name);

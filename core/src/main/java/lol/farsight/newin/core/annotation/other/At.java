@@ -1,4 +1,4 @@
-package lol.farsight.newin.api.annotation.other;
+package lol.farsight.newin.core.annotation.other;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
