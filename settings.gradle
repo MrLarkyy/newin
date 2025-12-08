@@ -12,7 +12,10 @@ plugins {
 
 rootProject.name = "newin"
 
-include("api", "impl")
+include("api", "core", "paper-impl", "agent")
+
 project(":api").name = "newin-api"
-project(":impl").name = "newin-impl"
+project(":core").name = "newin-core"
+project(":paper-impl").name = "newin-paper-impl"
+project(":agent").name = "newin-agent"
 

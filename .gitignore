@@ -4,8 +4,12 @@ build
 run
 out
 
+agent/build
+
+core/build
+
 api/build
 
-impl/build
-impl/run
-impl/.gradle
+paper-impl/build
+paper-impl/run
+paper-impl/.gradle
