@@ -31,9 +31,6 @@ tasks {
 
     shadowJar {
         archiveClassifier.set("")
-
-        // Exclude kotlin stuff - Kotlin should be shaded or loaded thru Libraries resolver in Paper.
-        exclude("kotlin/**", "org/intellij/**","org/jetbrains/**")
     }
 }
 
