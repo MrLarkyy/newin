@@ -15,11 +15,10 @@ import org.objectweb.asm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class NewinClassVisitor extends ClassVisitor {
@@ -162,15 +161,9 @@ public final class NewinClassVisitor extends ClassVisitor {
         }, ClassReader.EXPAND_FRAMES);
 
         try {
-            Files.write(Paths.get("modified.class"), classWriter.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
             final var cl = generator.define();
             final var ctor = MethodHandles.lookup()
-                            .unreflectConstructor(newinClass.getConstructor());
+                    .unreflectConstructor(newinClass.getDeclaredConstructor());
 
             cl.getMethod("factory", Supplier.class)
                     .invoke(null, (Supplier<Object>) () -> {
@@ -184,7 +177,7 @@ public final class NewinClassVisitor extends ClassVisitor {
             cl.getMethod("type", Class.class)
                     .invoke(null, newinClass);
         } catch (final @NotNull Exception e) {
-            LOGGER.error("Failed to initialize ephemeral class", e);
+            LOGGER.error("Failed to initialize ephemeral class, are you sure your newin class is public and your constructor has no parameters and is public?", e);
 
             return bytes;
         }

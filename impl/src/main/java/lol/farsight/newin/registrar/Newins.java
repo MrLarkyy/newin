@@ -6,7 +6,7 @@ import lol.farsight.newin.registrar.asm.NewinClassVisitor;
 import lol.farsight.newin.registrar.transformer.BcTransformer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public final class Newins implements NewinManager {
 
     private Newins() {}
 
-    public void applyToPackage(
+    public void applyFromPackage(
             final @NotNull Object pluginObj,
             final @NotNull String pack
     ) {
@@ -81,21 +81,19 @@ public final class Newins implements NewinManager {
         }
     }
 
-    public void applyToClasses(final @NotNull Class<?> @NotNull ... classes) {
+    public void applyFromClasses(final @NotNull Class<?> @NotNull ... classes) {
         Preconditions.checkNotNull(classes, "classes");
 
         for (int i = 0, classesLength = classes.length; i < classesLength; i++) {
             final var cl = classes[i];
             Preconditions.checkNotNull(cl, "element " + i + " of classes");
 
-            BcTransformer.invoke(cl, buffer -> {
-                apply(
-                        cl,
-                        new ClassReader(buffer)
-                );
-
-                return buffer;
-            });
+            apply(
+                    cl,
+                    new ClassReader(
+                            BcTransformer.bytes(cl)
+                    )
+            );
         }
     }
 

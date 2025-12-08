@@ -46,6 +46,9 @@ public final class BcTransformer implements ClassFileTransformer {
             return buffer;
         });
 
+        if (bytes.get() == null)
+            throw new RuntimeException("couldn't fetch bytecode of class " + cl);
+
         return bytes.get();
     }
 
@@ -75,13 +78,14 @@ public final class BcTransformer implements ClassFileTransformer {
             final @NotNull ProtectionDomain protectionDomain,
             final byte @NotNull [] classfileBuffer
     ) {
-        try {
-            if (cl == classBeingRedefined)
+        if (cl == classBeingRedefined) {
+            try {
                 return factory.apply(classfileBuffer);
-
-            return null;
-        } finally {
-            instrumentation.removeTransformer(this);
+            } finally {
+                instrumentation.removeTransformer(this);
+            }
         }
+
+        return classfileBuffer;
     }
 }

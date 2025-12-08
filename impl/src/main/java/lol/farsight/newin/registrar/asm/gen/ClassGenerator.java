@@ -7,12 +7,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.commons.AdviceAdapter;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 public sealed abstract class ClassGenerator
@@ -116,12 +112,6 @@ public sealed abstract class ClassGenerator
 
     public final Class<?> define() {
         writer.visitEnd();
-
-        try {
-            Files.write(Paths.get("ephemeral.class"), writer.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
         final byte[] bytes = writer.toByteArray();
         try {

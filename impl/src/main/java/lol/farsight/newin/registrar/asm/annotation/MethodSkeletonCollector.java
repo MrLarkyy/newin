@@ -90,8 +90,27 @@ public final class MethodSkeletonCollector extends MethodVisitor {
 
     @Override
     public void visitEnd() {
-        if (annotationCollector == null)
-            errors.add(NewinError.NO_ANNOTATIONS);
+        final var methType = Type.getMethodType(desc);
+        System.out.println(name);
+        if (name.equals("<init>")
+                && (
+                methType.getArgumentCount() != 0
+                        || methType.getReturnType().getSort() != Type.VOID
+                        || (access & Opcodes.ACC_PUBLIC) == 0
+        )
+        )
+            errors.add(NewinError.INVALID_CONSTRUCTOR);
+
+        if (annotationCollector == null) {
+            if (!name.equals("<init>") && !name.equals("<clinit>"))
+                errors.add(NewinError.NO_ANNOTATIONS);
+            else if (errors.isEmpty()) return;
+        } else {
+            if ((access & Opcodes.ACC_PUBLIC) == 0)
+                errors.add(NewinError.NON_PUBLIC);
+            if (name.equals("<init>") || name.equals("<clinit>"))
+                errors.add(NewinError.NON_STANDARD);
+        }
 
         if (!errors.isEmpty()) {
             for (final var error : errors) {
