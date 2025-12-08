@@ -10,26 +10,26 @@ allprojects {
         mavenCentral()
         maven {
             name = "papermc-repo"
-            url = "https://repo.papermc.io/repository/maven-public/"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
         }
     }
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply(plugin = "java")
 
-    def targetJavaVersion = 21
+    val targetJavaVersion = 21
     java {
-        def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+        val javaVersion = JavaVersion.toVersion(targetJavaVersion)
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
         if (JavaVersion.current() < javaVersion) {
-            toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+            toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
         }
     }
 
-    tasks.withType(JavaCompile).configureEach {
-        if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+    tasks.withType<JavaCompile>().configureEach {
+        if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
             options.release.set(targetJavaVersion)
         }
     }

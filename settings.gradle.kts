@@ -15,4 +15,3 @@ rootProject.name = "newin"
 include("api", "impl")
 project(":api").name = "newin-api"
 project(":impl").name = "newin-impl"
-
