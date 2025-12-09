@@ -1,7 +1,7 @@
 package lol.farsight.newin.core.transformer;
 
 import com.google.common.base.Preconditions;
-import lol.farsight.newin.core.agent.InstrumentationHolder;
+import lol.farsight.newin.agent.InstrumentationHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

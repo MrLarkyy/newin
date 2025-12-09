@@ -1,6 +1,7 @@
-package lol.farsight.newin.core.agent;
+package lol.farsight.newin.agent;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.instrument.Instrumentation;
 
@@ -12,7 +13,7 @@ public final class InstrumentationHolder {
     private static Instrumentation cached = null;
     static volatile Instrumentation instrumentation;
 
-    public static @NotNull Instrumentation get() {
+    public static @UnknownNullability Instrumentation get() {
         // we use the system classloader to load the class and then
         // get the instrumentation value, because the class loaded by
         // paper and the class loaded by the agent is the same, but it's

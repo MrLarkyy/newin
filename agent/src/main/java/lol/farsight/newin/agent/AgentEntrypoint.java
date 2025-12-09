@@ -1,4 +1,4 @@
-package lol.farsight.newin.core.agent;
+package lol.farsight.newin.agent;
 
 import org.jetbrains.annotations.NotNull;
 
