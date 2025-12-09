@@ -91,7 +91,6 @@ public final class MethodSkeletonCollector extends MethodVisitor {
     @Override
     public void visitEnd() {
         final var methType = Type.getMethodType(desc);
-        System.out.println(name);
         if (name.equals("<init>")
                 && (
                 methType.getArgumentCount() != 0
