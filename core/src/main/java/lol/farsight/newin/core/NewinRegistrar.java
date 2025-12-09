@@ -6,6 +6,9 @@ import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import lol.farsight.newin.agent.InstrumentationHolder;
+import lol.farsight.newin.core.annotation.Newin;
+import lol.farsight.newin.core.annotation.method.Inject;
+import lol.farsight.newin.core.annotation.other.At;
 import lol.farsight.newin.core.asm.NewinClassVisitor;
 import lol.farsight.newin.core.transformer.BcTransformer;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +22,7 @@ import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.CompletableFuture;
 
 public final class NewinRegistrar {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewinRegistrar.class);
@@ -34,7 +38,7 @@ public final class NewinRegistrar {
 
         final Path agentJar;
         try {
-            agentJar = Files.createTempFile("agent-", ".jar");
+            agentJar = Files.createTempFile("newin-java-agent-", ".jar");
         } catch (final IOException e) {
             LOGGER.error("couldn't create temp file for agent", e);
 

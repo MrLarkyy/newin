@@ -10,6 +10,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 final class InjectCollector implements SkeletonCollector<Inject> {
     InjectCollector() { }
@@ -26,14 +27,11 @@ final class InjectCollector implements SkeletonCollector<Inject> {
     ) {
         final Type methodType = Type.getMethodType(collector.desc);
 
-        final Type[] arguments;
-        if ((collector.access & Opcodes.ACC_STATIC) == 0)
-            arguments = Arrays.copyOfRange(
-                    methodType.getArgumentTypes(),
-                    1,
-                    methodType.getArgumentCount()
-            );
-        else arguments = methodType.getArgumentTypes();
+        final Type[] arguments = Arrays.copyOfRange(
+                methodType.getArgumentTypes(),
+                (collector.access & Opcodes.ACC_STATIC) == 0 ? 1 : 0,
+                methodType.getArgumentCount() - 1
+        );
 
         return new InjectSkeleton(
                 new MethodSkeleton.Identifier(

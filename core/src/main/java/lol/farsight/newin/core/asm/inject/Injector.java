@@ -4,9 +4,14 @@ import com.google.common.base.Preconditions;
 import lol.farsight.newin.core.annotation.method.Inject;
 import lol.farsight.newin.core.asm.gen.EphemeralClassGenerator;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.LocalVariablesSorter;
+
+import java.util.concurrent.CompletableFuture;
 
 public abstract sealed class Injector
         permits ExitInjector, HeadInjector {
@@ -45,11 +50,12 @@ public abstract sealed class Injector
     }
 
     protected final void write(
-            final @NotNull MethodVisitor mv,
+            final @NotNull GeneratorAdapter mv,
             final @NotNull String name,
             final int access,
             final @NotNull String targetDesc
     ) {
+
         int index = 0;
         if ((access & Opcodes.ACC_STATIC) == 0) {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -57,7 +63,9 @@ public abstract sealed class Injector
             index++;
         }
 
-        for (final Type argument : Type.getMethodType(targetDesc).getArgumentTypes()) {
+        final var targetType = Type.getMethodType(targetDesc);
+
+        for (final Type argument : targetType.getArgumentTypes()) {
             mv.visitVarInsn(
                     argument.getOpcode(Opcodes.ILOAD),
                     index
@@ -66,6 +74,23 @@ public abstract sealed class Injector
             index += argument.getSize();
         }
 
+        mv.visitTypeInsn(
+                Opcodes.NEW,
+                "java/util/concurrent/CompletableFuture"
+        );
+
+        mv.visitInsn(Opcodes.DUP);
+        mv.visitInsn(Opcodes.DUP);
+        mv.visitInsn(Opcodes.DUP);
+
+        mv.visitMethodInsn(
+                Opcodes.INVOKESPECIAL,
+                "java/util/concurrent/CompletableFuture",
+                "<init>",
+                "()V",
+                false
+        );
+
         mv.visitMethodInsn(
                 Opcodes.INVOKESTATIC,
                 owner,
@@ -73,6 +98,42 @@ public abstract sealed class Injector
                 desc,
                 false
         );
+
+        final var elseLabel = new Label();
+
+        mv.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL,
+                "java/util/concurrent/CompletableFuture",
+                "isDone",
+                "()Z",
+                false
+        );
+
+        mv.visitJumpInsn(
+                Opcodes.IFEQ,
+                elseLabel
+        );
+
+        final var ret = targetType.getReturnType();
+        if (ret.getSort() == Type.VOID) {
+            mv.visitInsn(Opcodes.POP);
+            mv.visitInsn(Opcodes.RETURN);
+        } else {
+            mv.visitMethodInsn(
+                    Opcodes.INVOKEVIRTUAL,
+                    "java/util/concurrent/CompletableFuture",
+                    "join",
+                    "()Ljava/lang/Object;",
+                    false
+            );
+
+            mv.unbox(ret);
+
+            mv.visitInsn(ret.getOpcode(Opcodes.IRETURN));
+        }
+
+        mv.visitLabel(elseLabel);
+        mv.visitInsn(Opcodes.POP);
     }
 
     public abstract @NotNull MethodVisitor apply(

@@ -9,6 +9,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public final class EphemeralClassGenerator extends ClassGenerator {
     public static final String INSTANCES_FIELD_NAME = "#INSTANCES#";

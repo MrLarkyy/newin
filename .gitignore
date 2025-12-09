@@ -4,5 +4,6 @@ build
 
 .env
 
+core/out
 core/build
 agent/build

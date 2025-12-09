@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AdviceAdapter;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.LocalVariablesSorter;
 
 public final class HeadInjector extends Injector {
     public HeadInjector(
@@ -30,11 +32,13 @@ public final class HeadInjector extends Injector {
         Preconditions.checkNotNull(name, "name");
         Preconditions.checkNotNull(desc, "desc");
 
+        final var adapter = new GeneratorAdapter(mv, access, name, desc);
+
         final String injectionName = generator.injection(this.access, this.name, this.desc);
         return new AdviceAdapter(Opcodes.ASM9, mv, access, name, desc) {
             @Override
             protected void onMethodEnter() {
-                write(mv, injectionName, access, desc);
+                write(adapter, injectionName, access, desc);
             }
         };
     }
